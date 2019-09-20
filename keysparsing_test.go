@@ -33,6 +33,12 @@ func testError(t *testing.T, key string, expectedError string) {
 
 func TestBareKeyBasic(t *testing.T) {
 	testResult(t, "test", []string{"test"})
+	testResult(t, "test_test", []string{"test_test"})
+	testResult(t, "test_", []string{"test_"})
+	testResult(t, "_test", []string{"_test"})
+	testResult(t, "test-test", []string{"test-test"})
+	testResult(t, "test-", []string{"test-"})
+	testResult(t, "-test", []string{"-test"})
 }
 
 func TestBareKeyDotted(t *testing.T) {

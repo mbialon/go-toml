@@ -88,12 +88,28 @@ func TestBasicKeyWithUnderscore(t *testing.T) {
 		{Position{1, 1}, tokenKey, "hello_hello"},
 		{Position{1, 12}, tokenEOF, ""},
 	})
+	testFlow(t, "_hello_hello", []token{
+		{Position{1, 1}, tokenKey, "_hello_hello"},
+		{Position{1, 13}, tokenEOF, ""},
+	})
+	testFlow(t, "hello_hello_", []token{
+		{Position{1, 1}, tokenKey, "hello_hello_"},
+		{Position{1, 13}, tokenEOF, ""},
+	})
 }
 
 func TestBasicKeyWithDash(t *testing.T) {
 	testFlow(t, "hello-world", []token{
 		{Position{1, 1}, tokenKey, "hello-world"},
 		{Position{1, 12}, tokenEOF, ""},
+	})
+	testFlow(t, "-hello-world", []token{
+		{Position{1, 1}, tokenKey, "-hello-world"},
+		{Position{1, 13}, tokenEOF, ""},
+	})
+	testFlow(t, "hello-world-", []token{
+		{Position{1, 1}, tokenKey, "hello-world-"},
+		{Position{1, 13}, tokenEOF, ""},
 	})
 }
 
@@ -286,6 +302,39 @@ func TestKeyEqualArrayBoolsWithComments(t *testing.T) {
 		{Position{1, 21}, tokenTrue, "true"},
 		{Position{1, 25}, tokenRightBracket, "]"},
 		{Position{1, 33}, tokenEOF, ""},
+	})
+}
+
+func TestLexInlineTables(t *testing.T) {
+	testFlow(t, `foo = { bar = "buz" }`, []token{
+		{Position{1, 1}, tokenKey, "foo"},
+		{Position{1, 5}, tokenEqual, "="},
+		{Position{1, 7}, tokenLeftCurlyBrace, "{"},
+		{Position{1, 9}, tokenKey, "bar"},
+		{Position{1, 13}, tokenEqual, "="},
+		{Position{1, 16}, tokenString, "buz"},
+		{Position{1, 21}, tokenRightCurlyBrace, "}"},
+		{Position{1, 22}, tokenEOF, ""},
+	})
+	testFlow(t, `foo = { _bar = "buz" }`, []token{
+		{Position{1, 1}, tokenKey, "foo"},
+		{Position{1, 5}, tokenEqual, "="},
+		{Position{1, 7}, tokenLeftCurlyBrace, "{"},
+		{Position{1, 9}, tokenKey, "bar"},
+		{Position{1, 14}, tokenEqual, "="},
+		{Position{1, 17}, tokenString, "buz"},
+		{Position{1, 22}, tokenRightCurlyBrace, "}"},
+		{Position{1, 23}, tokenEOF, ""},
+	})
+	testFlow(t, `foo = { -bar = "buz" }`, []token{
+		{Position{1, 1}, tokenKey, "foo"},
+		{Position{1, 5}, tokenEqual, "="},
+		{Position{1, 7}, tokenLeftCurlyBrace, "{"},
+		{Position{1, 9}, tokenKey, "bar"},
+		{Position{1, 14}, tokenEqual, "="},
+		{Position{1, 17}, tokenString, "buz"},
+		{Position{1, 22}, tokenRightCurlyBrace, "}"},
+		{Position{1, 23}, tokenEOF, ""},
 	})
 }
 
