@@ -178,3 +178,47 @@ func TestLoadBytesBOM(t *testing.T) {
 		}
 	}
 }
+
+func TestTomlMultiline(t *testing.T) {
+	cases := []struct {
+		Data string
+		Want string
+	}{
+		{
+			`foo = """foo1
+
+foo2
+
+foo3"""
+`,
+			`foo = """
+foo1
+
+foo2
+
+foo3"""
+`,
+		},
+		{
+			`"""foo"""`,
+			`"""
+foo"""
+`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run("", func(t *testing.T) {
+			tree, err := Load(tc.Data)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got, err := tree.ToTomlString()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got != tc.Want {
+				t.Fatalf("Expected:\n%s\nGot:\n%s", tc.Want, got)
+			}
+		})
+	}
+}

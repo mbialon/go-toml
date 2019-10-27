@@ -329,7 +329,7 @@ func (p *tomlParser) parseRvalue() (interface{}, *SetOptions) {
 		if err != nil {
 			p.raiseError(tok, "%s", err)
 		}
-		return val
+		return val, nil
 	case tokenLocalDate:
 		v := strings.Replace(tok.val, " ", "T", -1)
 		isDateTime := false
